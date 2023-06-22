@@ -1,0 +1,109 @@
+package com.example.b1083json;
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.TextView;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import java.io.IOException;
+import java.io.InputStream;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+public class ViewActivity extends AppCompatActivity {
+    int mode;
+    TextView jsonholder,xmlheader,xmlholder,jsonheader;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_view);
+        jsonheader = findViewById(R.id.jsonheading);
+        jsonholder = findViewById(R.id.jsondataHolder);
+        xmlheader = findViewById(R.id.xmlheaderdata);
+        xmlholder = findViewById(R.id.xmldataHolder);
+        mode = getIntent().getIntExtra("mode",0);
+        if(mode==1){
+            parsejson();
+        }
+        if(mode ==2){
+            try {
+                parseXML();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public void parsejson()
+    {
+        xmlholder.setText(" ");
+        xmlheader.setText(" ");
+        String stringdata;
+        try {
+            InputStream inputStream = getAssets().open("data.json");
+            int size = inputStream.available(); // get the size
+            byte buffer[] = new byte[size]; // array created
+            inputStream.read(buffer); // read into that array(transfer the data to array)
+            stringdata = new String(buffer); //convert data
+            Log.e("data","PARSEjson: "+stringdata);
+            JSONObject jsonObject = new JSONObject(stringdata); // convert to jsonobject type
+            Log.e("data","PArseJSON:"+(jsonObject));
+            Log.e("data","par" + jsonObject.getClass().getName());
+            JSONObject cityObject = jsonObject.getJSONObject("City");
+            String cityName = cityObject.getString("City-Name");
+            String longitude = cityObject.getString("longitude");
+            String latitude = cityObject.getString("latitude");
+            String temp = cityObject.getString("temperature");
+            String humidity = cityObject.getString("humidity");
+            Log.e("data", "PARseJson: " + cityName);
+            jsonholder.setText("City-Name: "+cityName+"\n\n");
+            jsonholder.append("Longitude: "+longitude+"\n\n");
+            jsonholder.append("Latitude: "+latitude+"\n\n");
+            jsonholder.append("Temperature: "+temp+"\n\n");
+            jsonholder.append("Humidity: "+humidity+"\n\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+    public void parseXML() throws IOException {
+        jsonheader.setText(" ");
+        jsonholder.setText(" ");
+        xmlholder.setText(" ");
+        InputStream inputStream= getAssets().open("Data.xml");
+        DocumentBuilderFactory documentBuilderFactory =
+                DocumentBuilderFactory.newInstance();
+        try {
+            DocumentBuilder documentBuilder =
+                    documentBuilderFactory.newDocumentBuilder();
+            Document document =documentBuilder.parse(inputStream);
+            NodeList citylist = document.getElementsByTagName("City");
+            for(int i= 0;i<citylist.getLength();i++){
+                Node c = citylist.item(i);
+                if(c.getNodeType() == Node.ELEMENT_NODE){
+                    Element city = (Element) c;
+                    NodeList citydetail = city.getChildNodes();
+                    for(int j=0;j<citydetail.getLength();j++){
+                        Node n =citydetail.item(j);
+                        if(n.getNodeType() == Node.ELEMENT_NODE){
+                            Element citydetaillist = (Element) n;
+                            String tagvalue = citydetaillist.getTagName();
+                            String value = citydetaillist.getTextContent();
+                            Log.e("data","parseXML:" +value);
+                            xmlholder.append(tagvalue+" - "+value+ "\n");
+                        }
+                    }
+                }
+            }
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        }
+    }
+}

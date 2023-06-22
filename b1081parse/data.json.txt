@@ -1,0 +1,9 @@
+{
+  "City": {
+    "City_Name":"Mangaluru",
+    "Longitude":"75",
+    "Latitude":"12",
+    "Temperature":"30",
+    "Humidity":"90%"
+  }
+}

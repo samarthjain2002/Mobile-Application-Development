@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<City>
+    <City-Name>Ujire</City-Name>
+    <longitude>75</longitude>
+    <latitude>12</latitude>
+    <temperature>30</temperature>
+    <humidity>90%</humidity>
+</City>
